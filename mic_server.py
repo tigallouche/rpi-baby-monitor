@@ -29,8 +29,8 @@ stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, fra
 read_list = [serversocket]
 print "recording..."
 
-try:
-    while True:
+while True:
+    try:
         readable, writable, errored = select.select(read_list, [], [])
         for s in readable:
             if s is serversocket:
@@ -41,8 +41,8 @@ try:
                 data = s.recv(1024)
                 if not data:
                     read_list.remove(s)
-except KeyboardInterrupt:
-    pass
+    except KeyboardInterrupt, socket.error:
+        pass
 
 
 print "finished recording"
