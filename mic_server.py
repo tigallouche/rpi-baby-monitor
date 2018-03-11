@@ -3,6 +3,7 @@
 import pyaudio
 import socket
 import select
+from socket import error as SocketError
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -30,19 +31,19 @@ read_list = [serversocket]
 print "recording..."
 
 while True:
-    try:
-        readable, writable, errored = select.select(read_list, [], [])
-        for s in readable:
-            if s is serversocket:
-                (clientsocket, address) = serversocket.accept()
-                read_list.append(clientsocket)
-                print "Connection from", address
-            else:
+    readable, writable, errored = select.select(read_list, [], [])
+    for s in readable:
+        if s is serversocket:
+            (clientsocket, address) = serversocket.accept()
+            read_list.append(clientsocket)
+            print "Connection from", address
+        else:
+            try:
                 data = s.recv(1024)
                 if not data:
                     read_list.remove(s)
-    except KeyboardInterrupt, socket.error:
-        pass
+            except socket.error:
+                pass
 
 
 print "finished recording"
